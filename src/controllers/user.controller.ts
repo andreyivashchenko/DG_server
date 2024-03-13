@@ -15,12 +15,13 @@ class UserController {
 			name: req.body.name,
 			pass: hashSync(req.body.pass),
 			email: req.body.email,
+			role: req.body.role,
 		}
 		try {
 			const userCredentials: IUser = await (
 				await pool.query(
-					`INSERT INTO users (name, pass, email) VALUES($1, $2, $3) RETURNING *`,
-					[user.name, user.pass, user.email]
+					`INSERT INTO users (name, pass, email, role) VALUES($1, $2, $3, $4) RETURNING *`,
+					[user.name, user.pass, user.email, user.role]
 				)
 			).rows[0]
 			const newUser = new User(userCredentials)

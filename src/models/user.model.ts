@@ -11,12 +11,14 @@ export class User {
 	_name: string
 	_email?: string
 	_pass: string
+	_role: 'admin' | 'client' | 'driver'
 
-	constructor({ id, name, email, pass }: IUser) {
+	constructor({ id, name, email, pass, role }: IUser) {
 		this._id = id ? id : undefined
 		this._name = name
 		this._email = email ? email : undefined
 		this._pass = pass
+		this._role = role
 	}
 
 	static async getUserByEmail(email: string): Promise<IUser> {
@@ -46,6 +48,7 @@ export class User {
 				_id: this._id,
 				name: this._name,
 				email: this._email,
+				role: this._role,
 			},
 			process.env.JWT_SECRET as string,
 			{ expiresIn: '1d' }
@@ -54,8 +57,9 @@ export class User {
 	toJSON() {
 		return {
 			_id: this._id,
-			userName: this._name,
-			userEmail: this._email,
+			name: this._name,
+			email: this._email,
+			role: this._role,
 			token: `Bearer ${this.createToken()}`,
 		}
 	}
