@@ -61,6 +61,9 @@ class RouteController {
             const {origins, destinations} = req.query;
             const formateOrigins = (JSON.parse(origins) as Point[]).map((point) => point.reverse());
             const formateDestinations = (JSON.parse(destinations) as Point[]).map((point) => point.reverse());
+            const respOrigins = JSON.parse(origins) as Point[];
+            const respDestinations = JSON.parse(destinations) as Point[];
+
             if (!formateOrigins || !formateDestinations) {
                 return res.status(401).send({
                     success: false,
@@ -78,8 +81,8 @@ class RouteController {
             const rows = rawMatrix.rows;
             const rawMatrixWithPoints = rows.map((row, i) => {
                 row.elements.map((elem, ind) => {
-                    elem.origin = formateOrigins[i] as Point;
-                    elem.destination = formateDestinations[ind] as Point;
+                    elem.origin = respOrigins[i] as Point;
+                    elem.destination = respDestinations[ind] as Point;
                     return elem;
                 });
                 return row;
