@@ -88,15 +88,40 @@ class RouteController {
                 return row;
             });
 
-            const filteredRows = rawMatrixWithPoints
+            const combinedObject: any = {};
+
+            rawMatrixWithPoints
                 .flatMap((row) => row.elements)
                 .filter((elem) => elem.distance.value != 0)
-                .reduce((prev, current) => (prev.duration.value < current.duration.value ? prev : current));
+                .forEach((element) => {
+                    const originKey = `${element.origin[0]}_${element.origin[1]}`;
+
+                    if (!combinedObject[originKey]) {
+                        combinedObject[originKey] = {
+                            origin: element.origin,
+                            data: [],
+                            totalDuration: 0
+                        };
+                    }
+
+                    combinedObject[originKey].data.push({
+                        status: element.status,
+                        distance: element.distance,
+                        duration: element.duration,
+                        destination: element.destination
+                    });
+                    combinedObject[originKey].totalDuration += element.duration.value;
+                });
+
+            const minDurationObject = Object.keys(combinedObject).reduce((prev, current) =>
+                combinedObject[prev].totalDuration < combinedObject[current].totalDuration ? prev : current
+            );
+            console.log('minDurationObject', combinedObject[minDurationObject]);
 
             res.send({
                 success: true,
                 message: 'User created successfully.',
-                matrix: filteredRows
+                matrix: combinedObject[minDurationObject]
             });
         } catch (err) {
             res.send({
