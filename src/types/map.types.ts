@@ -24,3 +24,23 @@ export interface RawRoute {
         };
     };
 }
+
+export interface RawMatrix {
+    rows: RawElements[];
+}
+
+export interface RawElements {
+    elements: RawMatrixElement[];
+}
+
+export interface RawMatrixElement {
+    status: string;
+    origin: Point;
+    destination: Point;
+    distance: {
+        value: number;
+    };
+    duration: {
+        value: number;
+    };
+}
