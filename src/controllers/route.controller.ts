@@ -108,7 +108,8 @@ class RouteController {
                         status: element.status,
                         distance: element.distance,
                         duration: element.duration,
-                        destination: element.destination
+                        destination: element.destination,
+                        origin: element.origin
                     });
                     combinedObject[originKey].totalDuration += element.duration.value;
                 });
