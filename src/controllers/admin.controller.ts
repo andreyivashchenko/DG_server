@@ -1,83 +1,48 @@
 import {config} from 'dotenv';
 import {Request, Response} from 'express';
 import {pool} from '../db';
+import {transformData} from '../services/admin.servise';
 config();
-
-interface ObjectData {
-    client_id: number;
-    object_group_id: number;
-    object_id: number;
-    coordinates: {x: number; y: number};
-    status: string;
-}
 
 class AdminController {
     async getAllObjects(req: Request, res: Response) {
-        const allObjects = await pool.query(
-            'SELECT clients.client_id, objectgroup.object_group_id, objects.object_id, objects.coordinates , objects.status FROM clients JOIN objectgroup ON objectgroup.client_id = clients.client_id JOIN objects ON objects.object_group_id = objectgroup.object_group_id ORDER BY client_id'
-        );
+        try {
+            const allObjects = await pool.query(
+                'select cl.client_id, objg.object_group_id, obj.object_id, obj.coordinates , obj.status from clients as cl \
+                join objectgroup as objg on objg.client_id = cl.client_id \
+                join objects as obj on obj.object_group_id = objg.object_group_id'
+            );
 
-        interface ObjectData {
-            client_id: number;
-            object_group_id: number;
-            object_id: number;
-            coordinates: {x: number; y: number};
-            status: string;
+            const transformedData = transformData(allObjects.rows);
+            res.status(200).json({message: 'ok!', data: transformedData});
+        } catch (err) {
+            res.status(500).json({message: `Db error`, err: err});
         }
-
-        interface GroupedObject {
-            object_group_id: number;
-            objects: ObjectData[];
+    }
+    async getClients(req: Request, res: Response) {
+        try {
+            const clients = await pool.query(
+                'select cl.client_id, us.name, us.email from clients as cl \
+                join users as us on cl.user_id = us.id'
+            );
+            const clientsRows = clients.rows;
+            res.status(200).json({message: 'ok!', data: clientsRows});
+        } catch (err) {
+            res.status(500).json({message: `Db error`, err: err});
         }
+    }
+    async changeObjStatus(
+        req: Request<{}, {}, {object_id: number; status: 'working' | 'waiting' | 'repair'}>,
+        res: Response
+    ) {
+        try {
+            const {object_id, status} = req.body;
+            await pool.query('UPDATE objects SET status = $1 WHERE object_id = $2', [status, object_id]);
 
-        interface GroupedClient {
-            client_id: number;
-            groups: GroupedObject[];
+            res.status(200).json({message: 'ok!'});
+        } catch (err) {
+            res.status(500).json({message: `Db error`, err: err});
         }
-
-        function transformData(objects: ObjectData[]): GroupedClient[] {
-            const groupedDataMap = new Map<number, Map<number, ObjectData[]>>();
-
-            for (const obj of objects) {
-                if (!groupedDataMap.has(obj.client_id)) {
-                    groupedDataMap.set(obj.client_id, new Map<number, ObjectData[]>());
-                }
-
-                const clientGroupMap = groupedDataMap.get(obj.client_id);
-
-                if (clientGroupMap && clientGroupMap.has(obj.object_group_id)) {
-                    clientGroupMap.get(obj.object_group_id)!.push(obj);
-                } else {
-                    if (clientGroupMap) {
-                        clientGroupMap.set(obj.object_group_id, [obj]);
-                    }
-                }
-            }
-
-            const result: GroupedClient[] = [];
-
-            for (const [clientId, groupMap] of groupedDataMap) {
-                const groups: GroupedObject[] = [];
-
-                for (const [groupId, groupObjects] of groupMap) {
-                    groups.push({
-                        object_group_id: groupId,
-                        objects: groupObjects
-                    });
-                }
-
-                result.push({
-                    client_id: clientId,
-                    groups: groups
-                });
-            }
-
-            return result;
-        }
-
-        const transformedData = transformData(allObjects.rows);
-        console.log(transformedData);
-        res.json(transformedData);
     }
 }
 export default new AdminController();
