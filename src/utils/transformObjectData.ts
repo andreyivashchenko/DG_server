@@ -1,6 +1,6 @@
-import {GroupedClient, GroupedObject, ModifyObjectData, ObjectData} from '../types/admin.types';
+import {ObjectData, GroupedClient, ModifyObjectData, GroupedObject} from '../types/admin.types';
 
-export const transformData = (objects: ObjectData[]): GroupedClient[] => {
+export const transformObjectData = (objects: ObjectData[]): GroupedClient[] => {
     const groupedDataMap = new Map<number, Map<number, ModifyObjectData[]>>();
 
     const createModifyObject = (object: ObjectData): ModifyObjectData => {

@@ -1,10 +1,10 @@
 import {config} from 'dotenv';
 import {Request, Response} from 'express';
 import {pool} from '../db';
-import {transformData} from '../services/admin.servise';
+import {transformObjectData} from '../utils/transformObjectData';
 config();
 
-class AdminController {
+class ObjectController {
     async getAllObjects(req: Request, res: Response) {
         try {
             const allObjects = await pool.query(
@@ -13,24 +13,13 @@ class AdminController {
                 join objects as obj on obj.object_group_id = objg.object_group_id'
             );
 
-            const transformedData = transformData(allObjects.rows);
+            const transformedData = transformObjectData(allObjects.rows);
             res.status(200).json({message: 'ok!', data: transformedData});
         } catch (err) {
             res.status(500).json({message: `DB error`, err: err});
         }
     }
-    async getClients(req: Request, res: Response) {
-        try {
-            const clients = await pool.query(
-                'select cl.client_id, us.name, us.email from clients as cl \
-                join users as us on cl.user_id = us.id'
-            );
-            const clientsRows = clients.rows;
-            res.status(200).json({message: 'ok!', data: clientsRows});
-        } catch (err) {
-            res.status(500).json({message: `DB error`, err: err});
-        }
-    }
+
     async changeObjStatus(
         req: Request<{}, {}, {object_id: number; status: 'working' | 'waiting' | 'repair'}>,
         res: Response
@@ -45,4 +34,4 @@ class AdminController {
         }
     }
 }
-export default new AdminController();
+export default new ObjectController();
