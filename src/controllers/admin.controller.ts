@@ -16,7 +16,7 @@ class AdminController {
             const transformedData = transformData(allObjects.rows);
             res.status(200).json({message: 'ok!', data: transformedData});
         } catch (err) {
-            res.status(500).json({message: `Db error`, err: err});
+            res.status(500).json({message: `DB error`, err: err});
         }
     }
     async getClients(req: Request, res: Response) {
@@ -28,7 +28,7 @@ class AdminController {
             const clientsRows = clients.rows;
             res.status(200).json({message: 'ok!', data: clientsRows});
         } catch (err) {
-            res.status(500).json({message: `Db error`, err: err});
+            res.status(500).json({message: `DB error`, err: err});
         }
     }
     async changeObjStatus(
@@ -41,7 +41,7 @@ class AdminController {
 
             res.status(200).json({message: 'ok!'});
         } catch (err) {
-            res.status(500).json({message: `Db error`, err: err});
+            res.status(500).json({message: `DB error`, err: err});
         }
     }
 }

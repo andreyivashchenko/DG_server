@@ -7,7 +7,7 @@ export const transformData = (objects: ObjectData[]): GroupedClient[] => {
         const {client_id, object_group_id, ...newObj} = object;
         const ModifyObject: ModifyObjectData = {
             object_id: newObj.object_id,
-            coordinates: [newObj.coordinates.y, newObj.coordinates.x],
+            coordinates: [newObj.coordinates.x, newObj.coordinates.y],
             status: newObj.status
         };
         return ModifyObject;
