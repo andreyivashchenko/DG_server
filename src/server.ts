@@ -6,6 +6,7 @@ import authRouter from './routes/auth.routes';
 import routeRouter from './routes/route.routes';
 import objectRouter from './routes/object.routes';
 import clientRouter from './routes/client.routes';
+import objectGroupRouter from './routes/objectGroup.routes';
 import userRouter from './routes/user.routes';
 import {authJwt} from './services/auth.service';
 
@@ -24,6 +25,7 @@ app.use('/api', authJwt, userRouter);
 app.use('/route', routeRouter);
 app.use('/client', clientRouter);
 app.use('/object', objectRouter);
+app.use('/object-group', objectGroupRouter);
 
 app.listen(PORT, () => {
     console.log(`server started on port ${PORT}`);

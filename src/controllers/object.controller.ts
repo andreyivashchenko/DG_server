@@ -20,6 +20,32 @@ class ObjectController {
         }
     }
 
+    async getObjectsByClientId(req: Request, res: Response) {
+        try {
+            const clientId = +req.params.id;
+
+            if (Number.isNaN(clientId)) {
+                return res.status(400).send({
+                    success: false,
+                    message: 'Invalid clientId.'
+                });
+            }
+
+            const objects = await pool.query(
+                `select cl.client_id, objg.object_group_id, obj.object_id, obj.coordinates , obj.status from clients as cl
+                join objectgroup as objg on objg.client_id = cl.client_id
+                join objects as obj on obj.object_group_id = objg.object_group_id
+                where cl.client_id = $1`,
+                [clientId]
+            );
+
+            const transformedData = transformObjectData(objects.rows);
+            res.status(200).json({message: 'ok!', data: transformedData});
+        } catch (err) {
+            res.status(500).json({message: `DB error`, err: err});
+        }
+    }
+
     async changeObjStatus(
         req: Request<{}, {}, {object_id: number; status: 'working' | 'waiting' | 'repair'}>,
         res: Response
