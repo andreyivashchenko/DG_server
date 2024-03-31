@@ -2,6 +2,7 @@ import {config} from 'dotenv';
 import {Request, Response} from 'express';
 import {pool} from '../db';
 import {transformObjectData} from '../utils/transformObjectData';
+import {Point} from '../types/map.types';
 config();
 
 class ObjectController {
@@ -41,6 +42,24 @@ class ObjectController {
 
             const transformedData = transformObjectData(objects.rows);
             res.status(200).json({message: 'ok!', data: transformedData});
+        } catch (err) {
+            res.status(500).json({message: `DB error`, err: err});
+        }
+    }
+
+    async createObject(req: Request<{}, {}, {coordinates: Point; object_group_id: number}>, res: Response) {
+        try {
+            const {coordinates, object_group_id} = req.body;
+
+            const initialObjectStatus = 'working';
+
+            await pool.query('INSERT INTO objects (coordinates, object_group_id, status) VALUES ($1, $2, $3)', [
+                `(${coordinates.join(',')})`,
+                object_group_id,
+                initialObjectStatus
+            ]);
+
+            res.status(200).json({message: 'ok!'});
         } catch (err) {
             res.status(500).json({message: `DB error`, err: err});
         }

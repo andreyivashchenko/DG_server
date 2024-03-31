@@ -3,6 +3,6 @@ import ObjectGroupController from '../controllers/objectGroup.controller';
 
 const router = express.Router();
 
-router.post('/', ObjectGroupController.addObjectGroup);
+router.post('/', ObjectGroupController.createObjectGroup);
 
 export default router;

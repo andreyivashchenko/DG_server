@@ -4,7 +4,7 @@ import {pool} from '../db';
 config();
 
 class ObjectGroupController {
-    async addObjectGroup(req: Request<{}, {}, {client_id: number}>, res: Response) {
+    async createObjectGroup(req: Request<{}, {}, {client_id: number}>, res: Response) {
         try {
             const {client_id} = req.body;
 
