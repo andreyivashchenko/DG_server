@@ -3,10 +3,11 @@ import {config} from 'dotenv';
 import express from 'express';
 import passport from 'passport';
 import authRouter from './routes/auth.routes';
-import routeRouter from './routes/route.routes';
-import objectRouter from './routes/object.routes';
 import clientRouter from './routes/client.routes';
+import driverRouter from './routes/driver.routes';
+import objectRouter from './routes/object.routes';
 import objectGroupRouter from './routes/objectGroup.routes';
+import routeRouter from './routes/route.routes';
 import userRouter from './routes/user.routes';
 import {authJwt} from './services/auth.service';
 
@@ -26,6 +27,7 @@ app.use('/route', routeRouter);
 app.use('/client', clientRouter);
 app.use('/object', objectRouter);
 app.use('/object-group', objectGroupRouter);
+app.use('/driver', driverRouter);
 
 app.listen(PORT, () => {
     console.log(`server started on port ${PORT}`);
