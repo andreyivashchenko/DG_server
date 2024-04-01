@@ -65,6 +65,31 @@ class ObjectController {
         }
     }
 
+    async deleteObjectById(req: Request, res: Response) {
+        try {
+            const objectId = +req.params.id;
+            if (Number.isNaN(objectId)) {
+                return res.status(400).send({
+                    success: false,
+                    message: 'Invalid objectId.'
+                });
+            }
+
+            const deleteCount = (await pool.query('DELETE FROM objects WHERE object_id=$1', [objectId])).rowCount;
+
+            if (!deleteCount) {
+                return res.status(400).send({
+                    success: false,
+                    message: 'Nothing to delete.'
+                });
+            }
+
+            res.status(200).json({message: 'ok!'});
+        } catch (err) {
+            res.status(500).json({message: `DB error`, err: err});
+        }
+    }
+
     async changeObjStatus(
         req: Request<{}, {}, {object_id: number; status: 'working' | 'waiting' | 'repair'}>,
         res: Response
