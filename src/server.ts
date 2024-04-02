@@ -9,6 +9,7 @@ import objectRouter from './routes/object.routes';
 import objectGroupRouter from './routes/objectGroup.routes';
 import routeRouter from './routes/route.routes';
 import userRouter from './routes/user.routes';
+import adminRouter from './routes/admin.routes';
 import {authJwt} from './services/auth.service';
 
 config();
@@ -28,6 +29,7 @@ app.use('/client', clientRouter);
 app.use('/object', objectRouter);
 app.use('/object-group', objectGroupRouter);
 app.use('/driver', driverRouter);
+app.use('/admin', adminRouter);
 
 app.listen(PORT, () => {
     console.log(`server started on port ${PORT}`);

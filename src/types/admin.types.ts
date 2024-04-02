@@ -1,4 +1,4 @@
-export interface ObjectData {
+export interface InfoData {
     client_id: number;
     object_group_id: number;
     object_id: number;
@@ -6,7 +6,7 @@ export interface ObjectData {
     status: string;
 }
 
-export interface ModifyObjectData extends Omit<ObjectData, 'client_id' | 'object_group_id' | 'coordinates'> {
+export interface ModifyObjectData extends Omit<InfoData, 'client_id' | 'object_group_id' | 'coordinates'> {
     coordinates: number[];
 }
 export interface GroupedObject {

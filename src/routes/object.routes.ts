@@ -3,10 +3,8 @@ import ObjectController from '../controllers/object.controller';
 
 const router = express.Router();
 
-router.get('/', ObjectController.getAllObjects);
+router.get('/:id', ObjectController.getObjectsByObjectGroupId);
 router.post('/', ObjectController.createObject);
-router.get('/:id', ObjectController.getObjectsByClientId);
 router.delete('/:id', ObjectController.deleteObjectById);
-router.post('/status', ObjectController.changeObjStatus);
 
 export default router;

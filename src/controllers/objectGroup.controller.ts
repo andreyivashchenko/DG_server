@@ -4,6 +4,25 @@ import {pool} from '../db';
 config();
 
 class ObjectGroupController {
+    async getObjectGroupsByClientId(req: Request<{id: number}>, res: Response) {
+        try {
+            const clientId = req.params.id;
+
+            if (Number.isNaN(clientId)) {
+                return res.status(400).send({
+                    success: false,
+                    message: 'Invalid clientId.'
+                });
+            }
+
+            const objectGroups = await pool.query('SELECT * FROM objectgroup WHERE client_id=$1', [clientId]);
+
+            res.status(200).json({message: 'ok!', data: objectGroups.rows});
+        } catch (err) {
+            res.status(500).json({message: `DB error`, err: err});
+        }
+    }
+
     async createObjectGroup(req: Request<{}, {}, {client_id: number}>, res: Response) {
         try {
             const {client_id} = req.body;
