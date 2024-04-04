@@ -16,7 +16,9 @@ export const insertUser = async (data: IUserRequest) => {
         await pool.query('INSERT INTO clients (user_id, name_org) VALUES ($1, $2)', [user.id, nameOrg]);
         return user;
     } else if ((data.role as Roles) === 'driver') {
-        const {fullName, nameOrg, email, role, pass} = data;
+        const {fullName, nameOrg, email, role} = data;
+        const pass = hashSync(data.pass);
+
         const user: IUser = await (
             await pool.query(`INSERT INTO users ( pass, email, role) VALUES($1, $2, $3) RETURNING *`, [
                 pass,
@@ -30,7 +32,9 @@ export const insertUser = async (data: IUserRequest) => {
         );
         return user;
     } else {
-        const {email, role, pass} = data;
+        const {email, role} = data;
+        const pass = hashSync(data.pass);
+
         const user: IUser = await (
             await pool.query(`INSERT INTO users ( pass, email, role) VALUES($1, $2, $3) RETURNING *`, [
                 pass,
