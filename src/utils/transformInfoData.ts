@@ -1,10 +1,11 @@
 import {InfoData, GroupedClient, ModifyObjectData, GroupedObject} from '../types/admin.types';
 
+// FIXME: ПЕРЕДЕЛАЙ МЕНЯ ПОЛНОСТЬЮ!!!
 export const transformInfoData = (objects: InfoData[]): GroupedClient[] => {
     const groupedDataMap = new Map<number, Map<number, ModifyObjectData[]>>();
 
     const createModifyObject = (object: InfoData): ModifyObjectData => {
-        const {client_id, object_group_id, ...newObj} = object;
+        const {client_id, object_group_id, optimal_object_id, ...newObj} = object;
         const ModifyObject: ModifyObjectData = {
             object_id: newObj.object_id,
             coordinates: [newObj.coordinates.x, newObj.coordinates.y],
@@ -35,8 +36,13 @@ export const transformInfoData = (objects: InfoData[]): GroupedClient[] => {
         const groups: GroupedObject[] = [];
 
         for (const [groupId, groupObjects] of groupMap) {
+            const optimalObjectId = objects.find(
+                (obj) => obj.client_id === clientId && obj.object_group_id === groupId
+            )?.optimal_object_id;
+
             groups.push({
                 object_group_id: groupId,
+                optimal_object_id: optimalObjectId,
                 objects: groupObjects
             });
         }

@@ -8,7 +8,7 @@ class AdminController {
     async getAllInfo(req: Request, res: Response) {
         try {
             const allObjects = await pool.query(
-                'select cl.client_id, objg.object_group_id, obj.object_id, obj.coordinates , obj.status from clients as cl \
+                'select cl.client_id, objg.object_group_id, objg.optimal_object_id, obj.object_id, obj.coordinates , obj.status from clients as cl \
                 join objectgroup as objg on objg.client_id = cl.client_id \
                 join objects as obj on obj.object_group_id = objg.object_group_id'
             );
