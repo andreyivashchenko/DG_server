@@ -1,9 +1,11 @@
+import {hashSync} from 'bcrypt-nodejs';
 import {pool} from '../db';
 import {IUser, IUserRequest, Roles} from '../types/user.types';
 
 export const insertUser = async (data: IUserRequest) => {
     if ((data.role as Roles) === 'client') {
-        const {nameOrg, email, role, pass} = data;
+        const {nameOrg, email, role} = data;
+        const pass = hashSync(data.pass);
         const user: IUser = await (
             await pool.query(`INSERT INTO users ( pass, email, role) VALUES($1, $2, $3) RETURNING *`, [
                 pass,
