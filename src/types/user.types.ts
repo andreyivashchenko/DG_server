@@ -10,6 +10,7 @@ export interface IUserRequest {
     nameOrg?: string;
     fullName?: string;
     name?: string;
+    client_id?: string;
     email: string;
     pass: string;
     role: Roles;
