@@ -33,5 +33,55 @@ class AdminController {
             res.status(500).json({message: `DB error`, err: err});
         }
     }
+    async setDriverData(
+        req: Request<{}, {}, {driverId: number; objectGroupId: number; nameOrg: string; status: string}>,
+        res: Response
+    ) {
+        try {
+            const {driverId, objectGroupId, nameOrg, status} = req.body;
+
+            if (Number.isNaN(driverId)) {
+                return res.status(400).json({
+                    succes: false,
+                    message: 'Invalid driver id'
+                });
+            }
+            if (Number.isNaN(objectGroupId)) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'Invalid driver id'
+                });
+            }
+            const optimalObjectId = await pool.query(
+                'select optimal_object_id from objectgroup where object_group_id = $1',
+                [objectGroupId]
+            );
+            if (!optimalObjectId) {
+                return res.status(500).json({
+                    success: false,
+                    message: 'Optimal object is not found'
+                });
+            }
+            const optimalObjectCoordinates = await pool.query('select coordinates from objects where object_id = $1', [
+                optimalObjectId.rows[0]
+            ]);
+            await pool.query(
+                'UPDATE drivers\
+                set object_group_id = $2, name_org = $3, status = $4, coordinates = $5 \
+                where driver_id = $1',
+                [driverId, objectGroupId, nameOrg, status, optimalObjectCoordinates.rows[0]]
+            );
+            res.status(200).send({
+                success: true,
+                message: 'Ok!'
+            });
+        } catch (error) {
+            res.status(500).json({
+                success: false,
+                message: 'DB error',
+                error: error
+            });
+        }
+    }
 }
 export default new AdminController();
