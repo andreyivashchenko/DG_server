@@ -36,7 +36,7 @@ export class User {
     createToken() {
         return jwt.sign(
             {
-                _id: this._id,
+                id: this._id,
                 email: this._email,
                 role: this._role
             },
@@ -46,7 +46,7 @@ export class User {
     }
     toJSON() {
         return {
-            _id: this._id,
+            id: this._id,
             email: this._email,
             role: this._role,
             token: `Bearer ${this.createToken()}`
