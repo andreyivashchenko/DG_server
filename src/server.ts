@@ -28,7 +28,7 @@ app.use('/route', authJwt, routeRouter);
 app.use('/client', authJwt, clientRouter);
 app.use('/object', authJwt, objectRouter);
 app.use('/object-group', authJwt, objectGroupRouter);
-app.use('/driver', authJwt, driverRouter);
+app.use('/driver', driverRouter);
 app.use('/admin', authJwt, adminRouter);
 
 app.listen(PORT, () => {
