@@ -71,7 +71,8 @@ class DriverController {
     ) {
         try {
             const drivers = await pool.query(
-                'select driver_id, object_group_id, full_name, name_org, status from drivers '
+                'select d.driver_id,og.client_id, d.object_group_id, d.full_name, d.status  from drivers d\
+                left join objectgroup as og on d.object_group_id = og.object_group_id '
             );
             if (!drivers.rows) {
                 return res.status(500).json({
@@ -83,6 +84,22 @@ class DriverController {
                 success: true,
                 message: 'ok!',
                 data: drivers.rows
+            });
+        } catch (error) {
+            res.status(500).json({
+                success: false,
+                message: 'DB error'
+            });
+        }
+    }
+
+    async getFreeDrivers(req: Request, res: Response) {
+        try {
+            const drivers = (await pool.query('select driver_id , full_name ,object_group_id  from drivers d ')).rows;
+            res.status(200).json({
+                success: true,
+                message: 'ok!',
+                data: drivers
             });
         } catch (error) {
             res.status(500).json({

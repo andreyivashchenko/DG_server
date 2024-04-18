@@ -34,11 +34,12 @@ class AdminController {
         }
     }
     async setDriverData(
-        req: Request<{}, {}, {driverId: number; objectGroupId: number; nameOrg: string; status: string}>,
+        req: Request<{}, {}, {driverId: number; objectGroupId: number; status: string}>,
         res: Response
     ) {
         try {
-            const {driverId, objectGroupId, nameOrg, status} = req.body;
+            const {driverId, objectGroupId, status} = req.body;
+            console.log(req.body);
 
             if (Number.isNaN(driverId)) {
                 return res.status(400).json({
@@ -49,7 +50,7 @@ class AdminController {
             if (Number.isNaN(objectGroupId)) {
                 return res.status(400).json({
                     success: false,
-                    message: 'Invalid driver id'
+                    message: 'Invalid objectGroupId'
                 });
             }
             const optimalObjectId = await pool.query(
@@ -67,9 +68,9 @@ class AdminController {
             ]);
             await pool.query(
                 'UPDATE drivers\
-                set object_group_id = $2, name_org = $3, status = $4, coordinates = $5 \
+                set object_group_id = $2, status = $3, coordinates = $4 \
                 where driver_id = $1',
-                [driverId, objectGroupId, nameOrg, status, optimalObjectCoordinates.rows[0]]
+                [driverId, objectGroupId, status, optimalObjectCoordinates.rows[0]]
             );
             res.status(200).send({
                 success: true,
@@ -83,5 +84,47 @@ class AdminController {
             });
         }
     }
+    async getClientsWithDrivers(req: Request, res: Response) {
+        try {
+            const clients = (await pool.query('select c.client_id , c.name_org  from clients c ')).rows;
+            const clientsWithGroups = await Promise.all(
+                clients.map(async (client: {client_id: number; name_org: string}) => {
+                    const objectGroups = (
+                        await pool.query(
+                            'select object_group_id , optimal_object_id  from objectgroup o  \
+                where client_id = $1',
+                            [client.client_id]
+                        )
+                    ).rows;
+                    const objectGroupsWithDrivers = await Promise.all(
+                        objectGroups.map(async (objectGroup: {object_group_id: number; optimal_object_id: number}) => {
+                            const drivers = (
+                                await pool.query(
+                                    'select driver_id, full_name  from drivers d  \
+                        where object_group_id  = $1',
+                                    [objectGroup.object_group_id]
+                                )
+                            ).rows;
+                            return {...objectGroup, drivers: drivers};
+                        })
+                    );
+
+                    return {...client, groups: objectGroupsWithDrivers};
+                })
+            );
+            res.status(200).json({
+                success: true,
+                message: 'ok!',
+                data: clientsWithGroups
+            });
+        } catch (error) {
+            res.status(500).json({
+                success: false,
+                message: 'DB error',
+                error: error
+            });
+        }
+    }
 }
+
 export default new AdminController();
