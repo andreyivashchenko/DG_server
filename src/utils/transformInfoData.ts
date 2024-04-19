@@ -1,4 +1,4 @@
-import {InfoData, GroupedClient, ModifyObjectData, GroupedObject} from '../types/admin.types';
+import {GroupedClient, GroupedObject, InfoData, ModifyObjectData} from '../types/admin.types';
 
 // FIXME: ПЕРЕДЕЛАЙ МЕНЯ ПОЛНОСТЬЮ!!!
 export const transformInfoData = (objects: InfoData[]): GroupedClient[] => {
@@ -46,9 +46,10 @@ export const transformInfoData = (objects: InfoData[]): GroupedClient[] => {
                 objects: groupObjects
             });
         }
-
+        const nameOrg = objects.find((obj) => obj.client_id === clientId)?.name_org!;
         result.push({
             client_id: clientId,
+            name_org: nameOrg,
             groups: groups
         });
     }
