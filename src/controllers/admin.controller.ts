@@ -33,49 +33,53 @@ class AdminController {
             res.status(500).json({message: `DB error`, err: err});
         }
     }
-    async setDriverData(
-        req: Request<{}, {}, {driverId: number; objectGroupId: number; status: string}>,
-        res: Response
-    ) {
-        try {
-            const {driverId, objectGroupId, status} = req.body;
-            console.log(req.body);
 
-            if (Number.isNaN(driverId)) {
-                return res.status(400).json({
-                    succes: false,
-                    message: 'Invalid driver id'
-                });
-            }
-            if (Number.isNaN(objectGroupId)) {
+    async setDriverData(req: Request<{}, {}, {object_group_id: number; drivers: number[]}>, res: Response) {
+        try {
+            const {object_group_id, drivers} = req.body;
+
+            if (Number.isNaN(object_group_id)) {
                 return res.status(400).json({
                     success: false,
                     message: 'Invalid objectGroupId'
                 });
             }
-            const optimalObjectId = await pool.query(
-                'select optimal_object_id from objectgroup where object_group_id = $1',
-                [objectGroupId]
-            );
-            if (!optimalObjectId) {
-                return res.status(500).json({
-                    success: false,
-                    message: 'Optimal object is not found'
-                });
-            }
-            const optimalObjectCoordinates = await pool.query('select coordinates from objects where object_id = $1', [
-                optimalObjectId.rows[0]
-            ]);
-            await pool.query(
-                'UPDATE drivers\
-                set object_group_id = $2, status = $3, coordinates = $4 \
-                where driver_id = $1',
-                [driverId, objectGroupId, status, optimalObjectCoordinates.rows[0]]
-            );
-            res.status(200).send({
-                success: true,
-                message: 'Ok!'
+            // const optimalObjectId = await pool.query(
+            //     'select optimal_object_id from objectgroup where object_group_id = $1',
+            //     [object_group_id]
+            // );
+
+            // const optimalObjectCoordinates = await pool.query('select coordinates from objects where object_id = $1', [
+            //     optimalObjectId.rows[0]
+            // ]);
+            drivers.forEach(async (driverId) => {
+                await pool.query('update drivers set object_group_id = $1, status = $2  where driver_id = $3', [
+                    object_group_id,
+                    'going_to_base',
+                    driverId
+                ]);
             });
+
+            res.status(200).json({message: 'ok!'});
+        } catch (error) {
+            res.status(500).json({
+                success: false,
+                message: 'DB error',
+                error: error
+            });
+        }
+    }
+
+    async removeDriverFromGroup(req: Request<{}, {}, {driverId: number}>, res: Response) {
+        try {
+            const {driverId} = req.body;
+            await pool.query(
+                `update drivers \
+            set object_group_id = $1, status = $2 \
+            where driver_id = $3`,
+                [null, 'waiting', driverId]
+            );
+            res.status(200).json({message: 'ok!'});
         } catch (error) {
             res.status(500).json({
                 success: false,
