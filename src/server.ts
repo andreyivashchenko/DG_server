@@ -23,13 +23,13 @@ app.use(passport.initialize());
 app.use(express.urlencoded({extended: true}));
 
 app.use('/auth', authRouter);
-app.use('/api', authJwt, userRouter);
-app.use('/route', routeRouter);
-app.use('/client', clientRouter);
-app.use('/object', objectRouter);
+app.use('/user', authJwt, userRouter);
+app.use('/route', authJwt, routeRouter);
+app.use('/client', authJwt, clientRouter);
+app.use('/object', authJwt, objectRouter);
 app.use('/object-group', objectGroupRouter);
 app.use('/driver', driverRouter);
-app.use('/admin', adminRouter);
+app.use('/admin', authJwt, adminRouter);
 
 app.listen(PORT, () => {
     console.log(`server started on port ${PORT}`);

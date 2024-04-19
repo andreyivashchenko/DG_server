@@ -1,6 +1,7 @@
 import {config} from 'dotenv';
 import {Request, Response} from 'express';
 import {pool} from '../db';
+import {transformCoordinates} from '../utils/transformCoordinates';
 config();
 
 class ObjectGroupController {
@@ -95,6 +96,42 @@ class ObjectGroupController {
             ]);
 
             res.status(200).json({message: 'ok!'});
+        } catch (err) {
+            res.status(500).json({message: `DB error`, err: err});
+        }
+    }
+
+    async getOptimalObject(req: Request<{id: number}>, res: Response) {
+        try {
+            const object_group_id = req.params.id;
+
+            if (!object_group_id || Number.isNaN(+object_group_id)) {
+                return res.status(400).send({
+                    success: false,
+                    message: 'Invalid object_group_id.'
+                });
+            }
+
+            const optimalObjectId = (
+                await pool.query('SELECT optimal_object_id from objectgroup where object_group_id = $1', [
+                    object_group_id
+                ])
+            ).rows?.[0]?.optimal_object_id;
+
+            if (!optimalObjectId) {
+                return res.status(400).send({
+                    success: false,
+                    message: `Object group don't have optimal object.`
+                });
+            }
+
+            const data = await pool.query('SELECT * FROM objects WHERE object_id = $1', [optimalObjectId]);
+
+            const object = data.rows[0];
+
+            const transformedObject = {...object, coordinates: transformCoordinates(object.coordinates)};
+
+            res.status(200).json({message: 'ok!', data: transformedObject});
         } catch (err) {
             res.status(500).json({message: `DB error`, err: err});
         }

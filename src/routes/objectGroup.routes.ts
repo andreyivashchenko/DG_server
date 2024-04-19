@@ -7,5 +7,6 @@ router.get('/:id', ObjectGroupController.getObjectGroupsByClientId);
 router.post('/', ObjectGroupController.createObjectGroup);
 router.delete('/:id', ObjectGroupController.deleteObjectGroupById);
 router.post('/optimal-object', ObjectGroupController.setOptimalObject);
+router.get('/optimal-object/:id', ObjectGroupController.getOptimalObject);
 
 export default router;

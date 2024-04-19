@@ -2,7 +2,7 @@ import {config} from 'dotenv';
 import {Request, Response} from 'express';
 import {pool} from '../db';
 import {Point} from '../types/map.types';
-import {transformObjectData} from '../utils/transformObjectData';
+import {transformCoordinates} from '../utils/transformCoordinates';
 config();
 
 class ObjectController {
@@ -18,7 +18,10 @@ class ObjectController {
             }
 
             const objects = await pool.query('SELECT * FROM objects WHERE object_group_id=$1', [objectGroupId]);
-            const transformedData = transformObjectData(objects.rows);
+            const transformedData = objects.rows.map((object) => ({
+                ...object,
+                coordinates: transformCoordinates(object.coordinates)
+            }));
 
             res.status(200).json({message: 'ok!', data: transformedData});
         } catch (err) {
