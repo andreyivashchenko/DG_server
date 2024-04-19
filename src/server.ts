@@ -27,7 +27,7 @@ app.use('/user', authJwt, userRouter);
 app.use('/route', authJwt, routeRouter);
 app.use('/client', authJwt, clientRouter);
 app.use('/object', authJwt, objectRouter);
-app.use('/object-group', authJwt, objectGroupRouter);
+app.use('/object-group', objectGroupRouter);
 app.use('/driver', driverRouter);
 app.use('/admin', authJwt, adminRouter);
 
